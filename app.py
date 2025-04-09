@@ -3,20 +3,19 @@ import pandas as pd
 import tldextract
 import re
 import pickle
+import joblib  
 
-# Load trained models
+# Load models
 with open("xgb_model.pkl", "rb") as f:
     xgb_model = pickle.load(f)
 
-with open(import joblib
-
+# Load compressed Random Forest model
 rf_model = joblib.load("rf_model_compressed.pkl")
-, "rb") as f:
-    rf_model = pickle.load(f)
 
-# Load TF-IDF Vectorizer
+# Load TF-IDF vectorizer
 with open("tfidf_vectorizer.pkl", "rb") as f:
     tfidf = pickle.load(f)
+
 
 # URL preprocessing function
 def preprocess_url(url):
@@ -43,7 +42,7 @@ def predict_url(url):
     return final_pred
 
 # Streamlit UI
-st.title("🔒 Phishing Website Detection")
+st.title("Phishing Website Detection")
 st.markdown("Enter a URL to check if it's **phishing** or **legitimate**.")
 
 user_input = st.text_input("Enter URL:", "")
@@ -54,6 +53,6 @@ if st.button("Check"):
     else:
         result = predict_url(user_input)
         if result == 1:
-            st.error("🚨 Phishing Website Detected!")
+            st.error("Phishing Website Detected!")
         else:
-            st.success("✅ Legitimate Website.")
+            st.success("Legitimate Website.")
