@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      width: 300px;
+      padding: 10px;
+      font-family: Arial, sans-serif;
+    }
+    #status {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      text-align: center;
+    }
+    .safe {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .phishing {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .unknown {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+  </style>
+</head>
+<body>
+  <h3>Phishing Detector</h3>
+  <p>Current URL:</p>
+  <div id="currentUrl"></div>
+  <div id="status" class="unknown">Analyzing...</div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
