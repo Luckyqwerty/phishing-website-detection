@@ -1,6 +1,4 @@
 streamlit
-joblib
-tldextract
 scikit-learn
 xgboost
-pandas
+tldextract
