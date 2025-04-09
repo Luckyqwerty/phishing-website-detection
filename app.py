@@ -1,41 +1,56 @@
 import streamlit as st
-import joblib
-import re
+import pandas as pd
 import tldextract
+import re
+import pickle
 
-st.title("🔐 Phishing Website Detection")
-st.markdown("Enter a website URL to check if it's **legit or phishing**")
+# Load trained models
+with open("xgb_model.pkl", "rb") as f:
+    xgb_model = pickle.load(f)
 
-# Load the improved model
-model = joblib.load('improved_model.pkl')
+with open("rf_model.pkl", "rb") as f:
+    rf_model = pickle.load(f)
 
-# Feature extraction
-def has_ip(url): return 1 if re.search(r'\d{1,3}(\.\d{1,3}){3}', url) else 0
-def count_special_chars(url): return sum(not c.isalnum() and c not in ['.', ':', '/'] for c in url)
-def uses_shortener(url): return 1 if re.search(r"bit\.ly|goo\.gl|shorte\.st|go2l\.ink|tinyurl", url) else 0
-def suspicious_keywords(url): 
-    return sum(1 for word in ['login','account','secure','ebayisapi','verify','bank'] if word in url.lower())
-def extract_features(url):
+# Load TF-IDF Vectorizer
+with open("tfidf_vectorizer.pkl", "rb") as f:
+    tfidf = pickle.load(f)
+
+# URL preprocessing function
+def preprocess_url(url):
     ext = tldextract.extract(url)
-    return [
-        len(url),
-        has_ip(url),
-        count_special_chars(url),
-        sum(c.isdigit() for c in url),
-        1 if url.startswith("https") else 0,
-        uses_shortener(url),
-        suspicious_keywords(url),
-        len(ext.subdomain.split('.')) if ext.subdomain else 0
-    ]
+    domain = ext.domain + '.' + ext.suffix
+    path = url.split(domain, 1)[-1] if domain in url else ''
+    return domain + path
 
-# Streamlit Input
-url_input = st.text_input("Enter URL:")
+def clean_url(url):
+    url = re.sub(r'https?://', '', url)
+    url = re.sub(r'www\.', '', url)
+    return preprocess_url(url)
 
-if url_input:
-    features = extract_features(url_input)
-    prediction = model.predict([features])[0]
+# Prediction function using ensemble
+def predict_url(url):
+    cleaned = clean_url(url)
+    vectorized = tfidf.transform([cleaned])
     
-    if prediction == 0:
-        st.success("✅ Legitimate Website")
+    xgb_pred = xgb_model.predict(vectorized)[0]
+    rf_pred = rf_model.predict(vectorized)[0]
+    
+    # Voting mechanism
+    final_pred = 1 if (xgb_pred + rf_pred) >= 1 else 0
+    return final_pred
+
+# Streamlit UI
+st.title("🔒 Phishing Website Detection")
+st.markdown("Enter a URL to check if it's **phishing** or **legitimate**.")
+
+user_input = st.text_input("Enter URL:", "")
+
+if st.button("Check"):
+    if user_input.strip() == "":
+        st.warning("Please enter a valid URL.")
     else:
-        st.error("🚨 Phishing Website Detected")
+        result = predict_url(user_input)
+        if result == 1:
+            st.error("🚨 Phishing Website Detected!")
+        else:
+            st.success("✅ Legitimate Website.")
