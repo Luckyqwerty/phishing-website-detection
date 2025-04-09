@@ -8,7 +8,10 @@ import pickle
 with open("xgb_model.pkl", "rb") as f:
     xgb_model = pickle.load(f)
 
-with open("rf_model.pkl", "rb") as f:
+with open(import joblib
+
+rf_model = joblib.load("rf_model_compressed.pkl")
+, "rb") as f:
     rf_model = pickle.load(f)
 
 # Load TF-IDF Vectorizer
