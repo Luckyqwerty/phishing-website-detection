@@ -4,6 +4,11 @@ import tldextract
 import re
 import pickle
 import joblib  
+import pickle
+import requests
+from sklearn.feature_extraction.text import TfidfVectorizer
+from flask import Flask, request, jsonify  # <-- NEW
+import threading  
 
 # Load models
 with open("xgb_model.pkl", "rb") as f:
@@ -56,3 +61,25 @@ if st.button("Check"):
             st.error("Phishing Website Detected!")
         else:
             st.success("Legitimate Website.")
+
+
+# ===== (1) Flask API Setup =====
+flask_app = Flask(__name__)
+
+@flask_app.route('/api/detect', methods=['POST'])
+def api_detect():
+    data = request.get_json()
+    url = data.get('url', '')
+    
+    # Reuse your existing prediction logic
+    is_phishing = predict(url)  # Call your predict() function from model.py
+    return jsonify({'is_phishing': bool(is_phishing)})
+
+def run_flask():
+    flask_app.run(port=8502)  # Different port than Streamlit
+
+# Start Flask in background
+threading.Thread(target=run_flask, daemon=True).start()
+
+# ===== (2) Your Existing Streamlit UI ===== 
+# ... (keep all your existing Streamlit code below) ...
