@@ -32,8 +32,8 @@ def predict_url(url):
     return prediction, confidence
 
 # Streamlit UI
-st.set_page_config(page_title="Safe Link Detection", page_icon="🔗")
-st.title("🔐 Safe Link Detection")
+st.set_page_config(page_title="Phishing Website Detection", page_icon="🔗")
+st.title("Phishing Website Detection")
 st.markdown("Enter a URL below to check whether it is **safe** or a **phishing link** using our trained machine learning model.")
 
 input_url = st.text_input("Enter URL here:")
@@ -42,8 +42,8 @@ if st.button("Check"):
     if input_url:
         prediction, confidence = predict_url(input_url)
         if prediction == 1:
-            st.error(f"⚠️ Phishing Link Detected! (Confidence: {confidence:.2f})")
+            st.error(f"Phishing Link Detected! (Confidence: {confidence:.2f})")
         else:
-            st.success(f"✅ This link appears safe. (Confidence: {confidence:.2f})")
+            st.success(f"This link appears safe. (Confidence: {confidence:.2f})")
     else:
         st.warning("Please enter a URL.")
