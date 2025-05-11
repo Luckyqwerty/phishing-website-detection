@@ -5,11 +5,14 @@ import re
 # Load model and vectorizer
 @st.cache_resource
 def load_model():
-    model = joblib.load("rf_model_compressed.pkl")
-    vectorizer = joblib.load("tfidf_vectorizer.pkl")
-    return model, vectorizer
+    try:
+        model = joblib.load("rf_model_compressed.pkl")
+        vectorizer = joblib.load("tfidf_vectorizer.pkl")
+        return model, vectorizer
+    except Exception as e:
+        st.error(f"Error loading model/vectorizer: {e}")
+        raise e
 
-model, vectorizer = load_model()
 
 # Preprocessing function
 def preprocess_url(url):
